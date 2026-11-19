@@ -1,4 +1,5 @@
 import express from 'express';
+import { timingSafeEqual } from 'node:crypto';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
@@ -12,13 +13,52 @@ app.use(express.json({ limit: '64kb' }));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok', service: 'user-service' }));
 app.use(rateLimit({ windowMs: 900000, limit: 300, standardHeaders: 'draft-8', legacyHeaders: false }));
-app.use(authenticate);
 
 const db = () => {
   const url = process.env.USER_DATABASE_URL || process.env.DATABASE_URL;
   if (!url) throw new Error('USER_DATABASE_URL is required.');
   return neon(url);
 };
+
+function internal(req, res, next) {
+  const expected = Buffer.from(process.env.AUTH_INTERNAL_TOKEN || '');
+  const actual = Buffer.from((req.get('authorization') || '').replace(/^Bearer\s+/i, ''));
+  if (expected.length < 32 || actual.length !== expected.length || !timingSafeEqual(actual, expected)) {
+    return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Acceso no autorizado al servicio interno.' } });
+  }
+  next();
+}
+
+const internalProfileSchema = z.object({
+  userId: z.uuid(),
+  fullName: z.string().trim().min(2).max(180),
+  institutionalCode: z.string().trim().min(2).max(50),
+});
+
+app.post('/internal/profiles', internal, async (req, res, next) => {
+  const parsed = internalProfileSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: { code: 'INVALID_INPUT', message: 'Datos del perfil inválidos.' } });
+  }
+  try {
+    const sql = db();
+    const { userId, fullName, institutionalCode } = parsed.data;
+    const rows = await sql`
+      INSERT INTO directory.profiles (user_id, full_name, institutional_code, profile_type)
+      VALUES (${userId}, ${fullName}, ${institutionalCode}, 'student')
+      ON CONFLICT (user_id) DO NOTHING
+      RETURNING user_id, full_name, institutional_code, profile_type, active, created_at
+    `;
+    const profiles = rows.length
+      ? rows
+      : await sql`SELECT user_id, full_name, institutional_code, profile_type, active, created_at FROM directory.profiles WHERE user_id = ${userId} LIMIT 1`;
+    return res.status(201).json(profiles[0]);
+  } catch (error) {
+    return next(error);
+  }
+});
+
+app.use(authenticate);
 
 async function authCall(path, options = {}) {
   const baseUrl = process.env.AUTH_SERVICE_URL;

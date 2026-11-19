@@ -148,22 +148,39 @@ export async function provision({ email, fullName, password, role, idempotencyKe
   }
 }
 
-// User Registration with Profile linking (RF01)
-export async function registerUser({ email, password, role, fullName, institutionalCode }) {
-  const account = await provision({ email, password, role });
-  
-  // Notify user service or create profile
-  const userUrl = process.env.USER_SERVICE_URL;
-  if (userUrl && process.env.AUTH_INTERNAL_TOKEN) {
+// Public self-registration always creates a student account; staff roles are provisioned by admins.
+export async function registerUser({ email, password, fullName, institutionalCode }) {
+  const account = await provision({ email, password, role: 'student', fullName });
+
+  try {
+    const userUrl = process.env.USER_SERVICE_URL;
+    const internalToken = process.env.AUTH_INTERNAL_TOKEN;
+    if (!userUrl || !internalToken) {
+      throw Object.assign(new Error('User service configuration is required.'), {
+        code: 'USER_SERVICE_CONFIGURATION_ERROR',
+      });
+    }
+
+    const response = await fetch(new URL('/internal/profiles', userUrl), {
+      method: 'POST',
+      headers: { authorization: `Bearer ${internalToken}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ userId: account.id, fullName, institutionalCode }),
+    });
+    if (!response.ok) {
+      throw Object.assign(new Error('User profile creation failed.'), {
+        code: 'USER_PROFILE_CREATION_FAILED',
+      });
+    }
+  } catch (error) {
     try {
-      // User service profiles directory creation
-      const internalToken = process.env.AUTH_INTERNAL_TOKEN;
-      await fetch(new URL('/internal/profiles', userUrl), {
-        method: 'POST',
-        headers: { authorization: `Bearer ${internalToken}`, 'content-type': 'application/json' },
-        body: JSON.stringify({ userId: account.id, fullName, institutionalCode, role }),
-      }).catch(() => {});
-    } catch {}
+      await setActive(account.id, false);
+    } catch (rollbackError) {
+      console.error('Failed to deactivate account after profile creation failure.', {
+        userId: account.id,
+        code: rollbackError.code || 'INTERNAL_ERROR',
+      });
+    }
+    throw error;
   }
 
   return makeSession(account);

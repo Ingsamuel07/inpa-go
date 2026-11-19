@@ -142,7 +142,7 @@ export function AuthProvider({ children }) {
       return session.user;
     } catch (networkError) {
       if (networkError instanceof TypeError || networkError.message?.toLowerCase().includes('fetch')) {
-        throw new Error('El registro requiere conexión para confirmar el alta en Neon. Vuelve a intentarlo cuando tengas internet.');
+        throw new Error('No fue posible conectar con el API. Verifica la URL pública, la configuración CORS y tu conexión a internet.');
       }
       throw networkError;
     } finally {

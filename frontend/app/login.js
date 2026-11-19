@@ -33,7 +33,6 @@ export default function LoginScreen() {
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regCode, setRegCode] = useState('');
-  const [regRole, setRegRole] = useState('student'); // 'student' | 'teacher'
   const [regPassword, setRegPassword] = useState('');
 
   // Password reset/change form state
@@ -97,7 +96,6 @@ export default function LoginScreen() {
         fullName: regName,
         email: regEmail,
         institutionalCode: regCode,
-        role: regRole,
         password: regPassword,
       });
       setSuccessMessage('¡Registro completado exitosamente! Ingresando...');
@@ -297,26 +295,6 @@ export default function LoginScreen() {
                 value={regCode}
                 onChangeText={setRegCode}
               />
-
-              <Text style={styles.fieldLabel}>Rol Institucional</Text>
-              <View style={styles.roleRow}>
-                <Pressable
-                  style={[styles.roleSelectBtn, regRole === 'student' && styles.roleSelectBtnActive]}
-                  onPress={() => setRegRole('student')}
-                >
-                  <Text style={[styles.roleSelectText, regRole === 'student' && styles.roleSelectTextActive]}>
-                    🎓 Estudiante
-                  </Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.roleSelectBtn, regRole === 'teacher' && styles.roleSelectBtnActive]}
-                  onPress={() => setRegRole('teacher')}
-                >
-                  <Text style={[styles.roleSelectText, regRole === 'teacher' && styles.roleSelectTextActive]}>
-                    👨‍🏫 Docente
-                  </Text>
-                </Pressable>
-              </View>
 
               <Text style={styles.fieldLabel}>Contraseña (mínimo 8 caracteres)</Text>
               <TextInput

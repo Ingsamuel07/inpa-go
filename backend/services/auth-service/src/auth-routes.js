@@ -27,7 +27,6 @@ const registerSchema = z.object({
   password: z.string().min(8).max(128),
   fullName: z.string().trim().min(2).max(180),
   institutionalCode: z.string().trim().min(2).max(50),
-  role: z.enum(['student', 'teacher', 'admin']).default('student'),
 });
 
 const changePasswordSchema = z.object({
