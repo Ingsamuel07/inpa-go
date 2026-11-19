@@ -150,7 +150,7 @@ app.use((error, req, res, _next) => {
 });
 
 if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
-  const port = Number(process.env.API_GATEWAY_PORT || 4000);
+  const port = Number(process.env.PORT || process.env.API_GATEWAY_PORT || 4000);
   app.listen(port, () => console.log(`API Gateway listening on port ${port}`));
 }
 
