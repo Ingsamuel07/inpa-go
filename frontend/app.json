@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Inpa_Go",
+    "slug": "inpa-go",
+    "scheme": "inpago",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "bundleIdentifier": "co.edu.uninpago"
+    },
+    "android": {
+      "package": "co.edu.uninpago"
+    },
+    "plugins": [
+      "expo-router",
+      ["expo-secure-store", { "faceIDPermission": "Inpa_Go usa la biometría del dispositivo para proteger el acceso local." }],
+      ["expo-local-authentication", { "faceIDPermission": "Inpa_Go usa la biometría del dispositivo para proteger el acceso local." }],
+      ["expo-location", { "locationWhenInUsePermission": "Inpa_Go usa tu ubicación durante el registro de asistencia para validar la zona del campus." }],
+      ["expo-speech-recognition", { "microphonePermission": "Inpa_Go usa el micrófono para transcribir el llamado a lista cuando el docente lo inicia.", "speechRecognitionPermission": "Inpa_Go procesa el llamado a lista para sugerir coincidencias con el grupo seleccionado." }]
+    ],
+    "experiments": { "typedRoutes": false }
+  }
+}

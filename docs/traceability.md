@@ -1,0 +1,25 @@
+# Matriz de Trazabilidad ERS (IEEE 830) - INPAHU-GO
+
+Estado de los 13 Requisitos Funcionales (RF) y Requisitos No Funcionales (RNF) tras la implementación completa y modularización en microservicios:
+
+| ID | Requisito | Módulo | Estado | Evidencia de Implementación |
+|---|---|---|---|---|
+| **RF01** | Autenticación y biometría local | Auth + Frontend | **100% Implementado** | JWT corto (15 min), refresh token rotatorio hasheado en SHA-256 (`auth-service`), desbloqueo biométrico nativo con `expo-local-authentication` y almacenamiento seguro en `expo-secure-store`. |
+| **RF02** | Roles y control de permisos | Gateway + Servicios | **100% Implementado** | Middleware transversal `authenticate` y `requireRoles('admin', 'teacher', 'student')` en cada microservicio y rutas protegidas en Expo Router. |
+| **RF03** | Administración completa de usuarios | Users + Admin Panel | **100% Implementado** | CRUD integral en `user-service`: alta de estudiantes (`POST /students`), docentes (`POST /teachers`), administradores (`POST /admins`), actualización de perfiles (`PUT /:id`), y activación/suspensión (`PATCH /:id/status`). |
+| **RF04** | Importación masiva con Excel | Import Service + Admin | **100% Implementado** | `import-service` con motor `ExcelJS` (`POST /upload` y `GET /template`), validación de esquemas Zod fila a fila, registro de lotes en `imports.batches` y auditoría de errores en `imports.errors`. |
+| **RF05** | Asignaturas y grupos académicos | Academic Service | **100% Implementado** | CRUD completo de materias y grupos por periodo (`academic.courses`, `academic.groups`). |
+| **RF06** | Vinculación docente y matrícula | Academic Service + UI | **100% Implementado** | Endpoints de vinculación de docentes titulares (`POST /assignments`) y matrícula de estudiantes en grupos (`POST /enrollments`) con validación de unicidad e interfaz en el Admin Dashboard. |
+| **RF07** | Gestión de sesiones de clase | Attendance + Teacher | **100% Implementado** | Ciclo de vida completo de sesión: Apertura (`POST /sessions`), Pausa temporal (`PATCH /sessions/:id/pause`), Reanudación (`PATCH /sessions/:id/resume`) y Cierre definitivo (`PATCH /sessions/:id/close`). |
+| **RF08** | Micrófono y llamado por voz | Voice Service + UI | **100% Implementado** | Reconocimiento de voz en tiempo real con normalización fonética y de tildes en `voice-service`, visualizador visual de ondas de audio (`AudioWaveVisualizer`) y síntesis Text-to-Speech (TTS). |
+| **RF09** | Geocerca y validación GPS | Location Service + GPS | **100% Implementado** | Validación server-side mediante fórmula de Haversine contra las sedes de UNINPAHU (Sede Principal Cl. 44 y Sede Académica Cra. 16), validando radio de tolerancia e integridad. |
+| **RF10** | Registro y confirmación de asistencia | Attendance + Vistas | **100% Implementado** | Soporte de 4 estados: *Presente, Retardo, Ausente y Excusa*. Vista docente asistida por voz/manual y vista estudiante de auto-confirmación por geocerca (`POST /sessions/:id/check-in`). |
+| **RF11** | Consulta e historial de asistencia | Attendance + Student | **100% Implementado** | Panel del estudiante con cálculo automático del porcentaje de asistencia por asignatura (`GET /stats`), alertas de inasistencia (<80%) y línea de tiempo detallada por sesión (`GET /history`). |
+| **RF12** | Reportes PDF con filtros | Report Service | **100% Implementado** | Generación de reportes PDF oficiales con membrete institucional UNINPAHU, estadísticas resumidas de cumplimiento y detalle sesión por sesión (`report-service` con `pdfkit` y descarga/compartir en frontend). |
+| **RF13** | Cierre seguro de sesión | Auth + Frontend | **100% Implementado** | Revocación inmediata del refresh token en backend (`POST /auth/logout`), limpieza de llaves en `expo-secure-store` y redirección inmediata al Login. |
+| **RNF01** | Seguridad y Cifrado | Plataforma | **100% Cumplido** | HTTPS, Argon2/Bcrypt (cost factor 12), JWT con expiración corta, variables de entorno (`.env`), Helmet, Rate Limiting y consultas SQL parametrizadas contra inyección. |
+| **RNF02** | Rendimiento y concurrencia | Neon PostgreSQL | **100% Cumplido** | Consultas indexadas por llaves compuestas e índices B-tree en Neon, consultas parametrizadas ligeras sin sobrecarga de conexión en serverless. |
+| **RNF03** | Integridad y aislamiento | Base de datos | **100% Cumplido** | Aislamiento en esquemas PostgreSQL separados (`auth`, `directory`, `academic`, `attendance`, `location`, `imports`) con roles `NOLOGIN` y esquema Prisma representativo. |
+| **RNF04** | Modularidad de microservicios | Backend | **100% Cumplido** | API Gateway centralizado con proxy inverso por stream HTTP hacia 8 microservicios desacoplados. |
+| **RNF05** | Compatibilidad Móvil | Expo | **100% Cumplido** | Expo SDK 58, Expo Router, soporte nativo Android/iOS y compatibilidad web. |
+| **RNF06** | Privacidad de datos sensibles | App + Servicios | **100% Cumplido** | Minimización de datos: audio procesado en tiempo real sin almacenamiento de grabaciones, GPS verificado por distancia sin registrar rutas continuas. |

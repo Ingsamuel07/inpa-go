@@ -1,0 +1,3 @@
+function normalize(value){return value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();}
+function similarity(left,right){const a=new Set(left.split(' ')),b=new Set(right.split(' '));if(!a.size||!b.size)return 0;const common=[...a].filter((word)=>b.has(word)).length;return 2*common/(a.size+b.size);}
+export function matchRoster(transcript,profiles){const text=normalize(transcript);if(!text)return [];return profiles.map((p)=>({userId:p.user_id,name:p.full_name,score:similarity(text,normalize(p.full_name))})).filter((p)=>p.score>=0.5).sort((a,b)=>b.score-a.score).slice(0,5);}

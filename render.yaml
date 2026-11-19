@@ -1,0 +1,259 @@
+services:
+  # ============================================================================
+  # API Gateway - Punto de Entrada Único
+  # ============================================================================
+  - type: web
+    name: inpago-api-gateway
+    env: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm --workspace @inpago/api-gateway start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_GATEWAY_PORT
+        value: 10000
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-auth-service
+          property: host
+      - key: USER_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-user-service
+          property: host
+      - key: ACADEMIC_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-academic-service
+          property: host
+      - key: ATTENDANCE_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-attendance-service
+          property: host
+      - key: LOCATION_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-location-service
+          property: host
+      - key: VOICE_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-voice-service
+          property: host
+      - key: IMPORT_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-import-service
+          property: host
+      - key: REPORT_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-report-service
+          property: host
+
+  # ============================================================================
+  # Auth Service
+  # ============================================================================
+  - type: web
+    name: inpago-auth-service
+    env: node
+    buildCommand: npm install
+    startCommand: npm --workspace @inpago/auth-service start
+    envVars:
+      - key: AUTH_DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: AUTH_INTERNAL_TOKEN
+        sync: false
+
+  # ============================================================================
+  # User Service
+  # ============================================================================
+  - type: web
+    name: inpago-user-service
+    env: node
+    buildCommand: npm install
+    startCommand: npm --workspace @inpago/user-service start
+    envVars:
+      - key: USER_DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: AUTH_INTERNAL_TOKEN
+        sync: false
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-auth-service
+          property: host
+      - key: ACADEMIC_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-academic-service
+          property: host
+
+  # ============================================================================
+  # Academic Service
+  # ============================================================================
+  - type: web
+    name: inpago-academic-service
+    env: node
+    buildCommand: npm install
+    startCommand: npm --workspace @inpago/academic-service start
+    envVars:
+      - key: ACADEMIC_DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-auth-service
+          property: host
+
+  # ============================================================================
+  # Attendance Service
+  # ============================================================================
+  - type: web
+    name: inpago-attendance-service
+    env: node
+    buildCommand: npm install
+    startCommand: npm --workspace @inpago/attendance-service start
+    envVars:
+      - key: ATTENDANCE_DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-auth-service
+          property: host
+      - key: ACADEMIC_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-academic-service
+          property: host
+      - key: LOCATION_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-location-service
+          property: host
+
+  # ============================================================================
+  # Location Service
+  # ============================================================================
+  - type: web
+    name: inpago-location-service
+    env: node
+    buildCommand: npm install
+    startCommand: npm --workspace @inpago/location-service start
+    envVars:
+      - key: LOCATION_DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-auth-service
+          property: host
+      - key: ATTENDANCE_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-attendance-service
+          property: host
+
+  # ============================================================================
+  # Voice Service
+  # ============================================================================
+  - type: web
+    name: inpago-voice-service
+    env: node
+    buildCommand: npm install
+    startCommand: npm --workspace @inpago/voice-service start
+    envVars:
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-auth-service
+          property: host
+      - key: ATTENDANCE_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-attendance-service
+          property: host
+      - key: ACADEMIC_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-academic-service
+          property: host
+      - key: USER_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-user-service
+          property: host
+
+  # ============================================================================
+  # Import Service
+  # ============================================================================
+  - type: web
+    name: inpago-import-service
+    env: node
+    buildCommand: npm install
+    startCommand: npm --workspace @inpago/import-service start
+    envVars:
+      - key: IMPORT_DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-auth-service
+          property: host
+      - key: USER_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-user-service
+          property: host
+
+  # ============================================================================
+  # Report Service
+  # ============================================================================
+  - type: web
+    name: inpago-report-service
+    env: node
+    buildCommand: npm install
+    startCommand: npm --workspace @inpago/report-service start
+    envVars:
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-auth-service
+          property: host
+      - key: ACADEMIC_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-academic-service
+          property: host
+      - key: ATTENDANCE_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-attendance-service
+          property: host
+      - key: USER_SERVICE_URL
+        fromService:
+          type: web
+          name: inpago-user-service
+          property: host

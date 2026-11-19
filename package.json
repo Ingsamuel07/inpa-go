@@ -1,0 +1,35 @@
+{
+  "name": "inpago-platform",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "backend/api-gateway",
+    "backend/services/*",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "mobile:start": "npm --workspace frontend run start",
+    "mobile:web": "npm --workspace frontend run web",
+    "gateway:dev": "npm --workspace @inpago/api-gateway run dev",
+    "auth:dev": "npm --workspace @inpago/auth-service run dev",
+    "user:dev": "npm --workspace @inpago/user-service run dev",
+    "academic:dev": "npm --workspace @inpago/academic-service run dev",
+    "attendance:dev": "npm --workspace @inpago/attendance-service run dev",
+    "location:dev": "npm --workspace @inpago/location-service run dev",
+    "voice:dev": "npm --workspace @inpago/voice-service run dev",
+    "import:dev": "npm --workspace @inpago/import-service run dev",
+    "report:dev": "npm --workspace @inpago/report-service run dev",
+    "db:migrate": "node scripts/migrate-neon.js",
+    "bootstrap:admin": "node scripts/bootstrap-admin.js",
+    "test": "node --test backend/services/location-service/src/geo.test.js backend/services/voice-service/src/matcher.test.js frontend/src/voice/match-students.test.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "bcryptjs": "^3.0.2",
+    "pg": "^8.23.1",
+    "ws": "^8.23.0"
+  }
+}

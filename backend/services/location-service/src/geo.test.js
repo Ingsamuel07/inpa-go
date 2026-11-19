@@ -1,0 +1,3 @@
+import test from 'node:test'; import assert from 'node:assert/strict'; import { distanceMeters } from './geo.js';
+test('haversine reports zero at identical coordinates',()=>assert.equal(distanceMeters({latitude:4.6,longitude:-74.1},{latitude:4.6,longitude:-74.1}),0));
+test('haversine calculates a plausible distance across Bogotá latitude',()=>{const d=distanceMeters({latitude:4.6,longitude:-74},{latitude:4.601,longitude:-74});assert.ok(d>=110&&d<=112)});
