@@ -11,6 +11,7 @@ const allowedOrigins = (process.env.CORS_ORIGINS || '')
   .map((value) => value.trim())
   .filter(Boolean);
 const isProduction = process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL);
+const productionFrontendOrigin = 'https://inpa-go-frontend.vercel.app';
 
 if (isProduction) {
   if (!allowedOrigins.length || allowedOrigins.includes('*')) {
@@ -21,6 +22,9 @@ if (isProduction) {
     if (parsedOrigin.protocol !== 'https:' || parsedOrigin.origin !== origin) {
       throw new Error('Every production CORS_ORIGINS entry must be an HTTPS origin without a path.');
     }
+  }
+  if (!allowedOrigins.includes(productionFrontendOrigin)) {
+    allowedOrigins.push(productionFrontendOrigin);
   }
 }
 
